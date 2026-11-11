@@ -1,10 +1,15 @@
 export function measureCausalPatchNovelty({ tokens, patchSize = 5 } = {}) {
-  if (!Array.isArray(tokens) || tokens.some((token) => typeof token !== "string") || !Number.isInteger(patchSize) || patchSize < 1 || tokens.length < patchSize * 2) throw new TypeError("finite-causal-patch-input-invalid");
-  const current = tokens.slice(-patchSize).join("\u0000");
-  let eligiblePriorPatches = 0, recurrenceCount = 0;
-  for (let end = patchSize; end <= tokens.length - patchSize; end += 1) {
-    eligiblePriorPatches += 1;
-    if (tokens.slice(end - patchSize, end).join("\u0000") === current) recurrenceCount += 1;
+  if (!Array.isArray(tokens) || !Number.isInteger(patchSize) || patchSize < 1 || tokens.length < patchSize * 2) {
+    throw new TypeError("finite-causal-patch-input-invalid");
+  }
+  for (let index = 0; index < tokens.length; index += 1) {
+    if (typeof tokens[index] !== "string") throw new TypeError("finite-causal-patch-input-invalid");
+  }
+  const current = tokens.slice(-patchSize);
+  const eligiblePriorPatches = tokens.length - 2 * patchSize + 1;
+  let recurrenceCount = 0;
+  for (let start = 0; start < eligiblePriorPatches; start += 1) {
+    if (current.every((token, index) => token === tokens[start + index])) recurrenceCount += 1;
   }
   return Object.freeze({
     type: "CausalPatchNoveltyMeasurement",

@@ -8,3 +8,16 @@
 <!-- 561-group-standards:badges:end -->
 
 Measures recurrence and novelty of finite causal symbolic patches without claiming infinite tiling equivalence.
+
+## Measure a patch
+
+```js
+import { measureCausalPatchNovelty } from '@red-cup-engineering/causal-tiling-novelty-measurement-service';
+
+const result = measureCausalPatchNovelty({ tokens: ['a', 'b', 'a', 'b'], patchSize: 2 });
+console.log(result.recurrenceCount); // 1
+```
+
+The current patch is the last `patchSize` tokens. Eligible earlier windows end before it starts. The function compares individual string tokens, computes the recurrence frequency across eligible windows, and returns novelty as `1 / (1 + recurrenceCount)`. A measurement requires two complete patches. The default patch size is five.
+
+Run `npm test` to check prior-window boundaries, token identity and invalid inputs.
